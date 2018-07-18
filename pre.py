@@ -1,11 +1,12 @@
-# import the necessary packages
 import numpy as np
 import urllib2
 import cv2
 import subprocess
- 
+
 invalid_path="vgg_face_dataset/invalid.txt"
 folder_path="vgg_face_dataset/files/test/"
+
+SIZE=256
 
 class Entry:
     def __init__(self,label,idnum,img,pose,detect_score,curation):
@@ -68,12 +69,11 @@ def crop_and_scale(img,left,top,right,bottom):
         print "error"
         return np.array([])
     crop_img = img[top:bottom+1, left:right+1]
-    scale_img=cv2.resize(crop_img,(256,256))
+    scale_img=cv2.resize(crop_img,(SIZE,SIZE))
     return scale_img
 
-def process_files(files):
+def get_invalid(files):
     ivf = open(invalid_path, 'w')
-    data=list()
     for f in files:
         label = f[:-4]
         print label
@@ -103,20 +103,66 @@ def process_files(files):
                 if img.shape==(0,):
                     ivf.write(label+" "+str(idnum)+"\n")
                     continue
-                '''
-                pose=int(float(e[6]))
-                detect_score=float(e[7])
-                curation=bool(e[8])
-                datum=Entry(label,idnum,img,pose,detect_score,curation)
-                data.append(datum)
-                '''
     ivf.close()
     print "finished getting invalid imgs"
-    return data
+
+def calculate_avg(files):
+    cmd = "cat "+invalid_path
+    process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+    invalids = output.splitlines()
+    N = 20*len(files)-len(invalids)
+    avg_img=np.zeros((SIZE,SIZE,3),np.float)
+    print str(N)+" valid pics"
+    invalid_map=dict()
+    for invalid in invalids:
+        pair = invalid.split()
+        key = pair[0]
+        val = int(pair[1])
+        if key in invalid_map:
+            vals = invalid_map[key]
+            vals.append(val)
+            invalid_map[key]=vals
+        else:
+            vals = list()
+            vals.append(val)
+            invalid_map[key]=vals
+    for f in files:
+        label = f[:-4]
+        print label
+        cmd = "cat "+folder_path+f
+        process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+        output, error = process.communicate()
+        entries = output.splitlines()
+        for entry in entries:
+            e=entry.split()
+            idnum=int(e[0])
+            if label in invalid_map and idnum in invalid_map[label]:
+                continue
+            l=float(e[2])
+            t=float(e[3])
+            r=float(e[4])
+            b=float(e[5])
+            raw_img=url_to_image(e[1])
+            if raw_img.shape==(0,):
+                continue
+            else:
+                img=crop_and_scale(raw_img,l,t,r,b)
+                if img.shape==(0,):
+                    continue
+                float_img=img.astype(np.float)
+                avg_img+=float_img/N
+    avg_img=np.array(np.round(avg_img),dtype=np.uint8)
+    return avg_img
 
 def main():
     files=get_filenames()
-    data=process_files(files)
-    print len(data)
+    #get_invalid(files)
+    avg_img=calculate_avg(files)
+    print "got avg!"
+    cv2.imwrite('avg_img.png',avg_img)
+    cv2.imshow('window',avg_img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 main()
