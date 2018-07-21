@@ -1,0 +1,10 @@
+Aamir_Khan 1
+Aamir_Khan 2
+Aamir_Khan 8
+Aamir_Khan 10
+Aamir_Khan 11
+Aamir_Khan 14
+Aamir_Khan 17
+Aamir_Khan 18
+
+total: 8
