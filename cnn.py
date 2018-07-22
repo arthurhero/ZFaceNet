@@ -6,6 +6,15 @@ import time
 from datetime import timedelta
 import math
 
+'''
+from tensorflow.python.client import device_lib
+
+def get_available_gpus():
+    local_device_protos = device_lib.list_local_devices()
+    return [x.name for x in local_device_protos if x.device_type == 'GPU']
+
+print(get_available_gpus())
+'''
 
 # Convolutional Layer 1.
 filter_size1 = 5          # Convolution filters are 5 x 5 pixels.
@@ -199,54 +208,56 @@ y_true = tf.placeholder(tf.float32, shape=[None, num_classes], name='y_true')
 
 y_true_cls = tf.argmax(y_true, axis=1)
 
-layer_conv1, weights_conv1 = \
-    new_conv_layer(input=x_image,
-                   num_input_channels=num_channels,
-                   filter_size=filter_size1,
-                   num_filters=num_filters1,
-                   use_pooling=True)
+with tf.device('/gpu:0'):
+    layer_conv1, weights_conv1 = \
+            new_conv_layer(input=x_image,
+                num_input_channels=num_channels,
+                filter_size=filter_size1,
+                num_filters=num_filters1,
+                use_pooling=True)
 
 
-layer_conv2, weights_conv2 = \
-    new_conv_layer(input=layer_conv1,
-                   num_input_channels=num_filters1,
-                   filter_size=filter_size2,
-                   num_filters=num_filters2,
-                   use_pooling=True)
+    layer_conv2, weights_conv2 = \
+            new_conv_layer(input=layer_conv1,
+                num_input_channels=num_filters1,
+                filter_size=filter_size2,
+                num_filters=num_filters2,
+                use_pooling=True)
 
 
-layer_flat, num_features = flatten_layer(layer_conv2)
+    layer_flat, num_features = flatten_layer(layer_conv2)
 
 
-layer_fc1 = new_fc_layer(input=layer_flat,
-                         num_inputs=num_features,
-                         num_outputs=fc_size,
-                         use_relu=True)
+    layer_fc1 = new_fc_layer(input=layer_flat,
+            num_inputs=num_features,
+            num_outputs=fc_size,
+            use_relu=True)
 
-layer_fc2 = new_fc_layer(input=layer_fc1,
-                         num_inputs=fc_size,
-                         num_outputs=num_classes,
-                         use_relu=False)
+    layer_fc2 = new_fc_layer(input=layer_fc1,
+            num_inputs=fc_size,
+            num_outputs=num_classes,
+            use_relu=False)
 
 
-y_pred = tf.nn.softmax(layer_fc2)
+    y_pred = tf.nn.softmax(layer_fc2)
 
-y_pred_cls = tf.argmax(y_pred, axis=1)
+    y_pred_cls = tf.argmax(y_pred, axis=1)
 
-cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=layer_fc2,
-                                                        labels=y_true)
+    cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=layer_fc2,
+            labels=y_true)
 
-cost = tf.reduce_mean(cross_entropy)
+    cost = tf.reduce_mean(cross_entropy)
 
-optimizer = tf.train.AdamOptimizer(learning_rate=1e-4).minimize(cost)
+    optimizer = tf.train.AdamOptimizer(learning_rate=1e-4).minimize(cost)
 
-correct_prediction = tf.equal(y_pred_cls, y_true_cls)
+    correct_prediction = tf.equal(y_pred_cls, y_true_cls)
 
-accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
-session = tf.Session()
 
-session.run(tf.global_variables_initializer())
+session = tf.Session(config=tf.ConfigProto(log_device_placement=True))
+
+print(session.run(tf.global_variables_initializer()))
 
 train_batch_size = 64
 
@@ -261,7 +272,7 @@ def optimize(num_iterations):
     start_time = time.time()
 
     for i in range(total_iterations,
-                   total_iterations + num_iterations):
+            total_iterations + num_iterations):
 
         # Get a batch of training examples.
         # x_batch now holds a batch of images and
@@ -271,7 +282,7 @@ def optimize(num_iterations):
         # Put the batch into a dict with the proper names
         # for placeholder variables in the TensorFlow graph.
         feed_dict_train = {x: x_batch,
-                           y_true: y_true_batch}
+                y_true: y_true_batch}
 
         # Run the optimizer using this batch of training data.
         # TensorFlow assigns the variables in feed_dict_train
@@ -326,21 +337,21 @@ def plot_example_errors(cls_pred, correct):
 
     # Plot the first 9 images.
     plot_images(images=images[0:9],
-                cls_true=cls_true[0:9],
-                cls_pred=cls_pred[0:9])
+            cls_true=cls_true[0:9],
+            cls_pred=cls_pred[0:9])
 
 def plot_confusion_matrix(cls_pred):
-    # This is called from print_test_accuracy() below.
+        # This is called from print_test_accuracy() below.
 
     # cls_pred is an array of the predicted class-number for
     # all images in the test-set.
 
     # Get the true classifications for the test-set.
     cls_true = data.test.cls
-    
+
     # Get the confusion matrix using sklearn.
     cm = confusion_matrix(y_true=cls_true,
-                          y_pred=cls_pred)
+            y_pred=cls_pred)
 
     # Print the confusion matrix as text.
     print(cm)
@@ -365,7 +376,7 @@ def plot_confusion_matrix(cls_pred):
 test_batch_size = 256
 
 def print_test_accuracy(show_example_errors=False,
-                        show_confusion_matrix=False):
+        show_confusion_matrix=False):
 
     # Number of images in the test-set.
     num_test = len(data.test.images)
@@ -393,7 +404,7 @@ def print_test_accuracy(show_example_errors=False,
 
         # Create a feed-dict with these images and labels.
         feed_dict = {x: images,
-                     y_true: labels}
+                y_true: labels}
 
         # Calculate the predicted class using TensorFlow.
         cls_pred[i:j] = session.run(y_pred_cls, feed_dict=feed_dict)
