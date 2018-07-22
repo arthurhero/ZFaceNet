@@ -5,9 +5,16 @@ import sys
 import urllib2
 import cv2
 import subprocess
+import random
  
 invalid_path="vgg_face_dataset/invalid/"
+avg_path="vgg_face_dataset/avg/"
 folder_path="vgg_face_dataset/files/"
+validation_path="vgg_face_dataset/validation/"
+test_path="vgg_face_dataset/test/"
+
+NUM_PER_FILE=1000
+SIZE=256
 
 class Entry:
     def __init__(self,label,idnum,img,pose,detect_score,curation):
@@ -154,12 +161,167 @@ def process_files(files,batch):
     ivf.write("\ntotal: "+str(count)+"\n")
     ivf.close()
     print "finished getting invalid imgs"
-    return data
+
+def calculate_avg(files,batch):
+    cmd = "tail -n 1 "+invalid_path+batch+".txt"
+    process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+    num_invalid = int(output.split(':')[-1])
+    N = NUM_PER_FILE*len(files)-num_invalid
+    avg_img=np.zeros((SIZE,SIZE,3),np.float)
+    print str(N)+" valid pics"
+    '''
+    invalid_map=dict()
+    for invalid in invalids:
+        pair = invalid.split()
+        key = pair[0]
+        val = int(pair[1])
+        if key in invalid_map:
+            vals = invalid_map[key]
+            vals.append(val)
+            invalid_map[key]=vals
+        else:
+            vals = list()
+            vals.append(val)
+            invalid_map[key]=vals
+    '''
+    for f in files:
+        label = f[:-4]
+        print label
+        cmd = "cat "+folder_path+batch+"/"+f
+        process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+        output, error = process.communicate()
+        entries = output.splitlines()
+        for entry in entries:
+            e=entry.split()
+            idnum=int(e[0])
+            '''
+            if label in invalid_map and idnum in invalid_map[label]:
+                continue
+            '''
+            l=float(e[2])
+            t=float(e[3])
+            r=float(e[4])
+            b=float(e[5])
+            raw_img=url_to_image(e[1])
+            if raw_img.shape==(0,):
+                continue
+            else:
+                img=crop_and_scale(raw_img,l,t,r,b)
+                if img.shape==(0,):
+                    continue
+                float_img=img.astype(np.float)
+                avg_img+=float_img/N
+    avg_img=np.array(np.round(avg_img),dtype=np.uint8)
+    return N,avg_img
+
+def get_real_avg():
+    total=0
+    avg_img=np.zeros((SIZE,SIZE,3),np.float)
+    cmd = "ls "+avg_path
+    process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+    filenames=output.split()
+    for f in filenames:
+        num=int(f.split('_')[1])
+        total+=num
+    print total
+    for f in filenames:
+        img=cv2.imread(avg_path+f,cv2.IMREAD_UNCHANGED).astype(np.float)
+        num=int(f.split('_')[1])
+        avg_img+=img*(float(num)/float(total))
+    cv2.imwrite(avg_path+"real_avg.png",avg_img)
+
+def select_validation_test():
+    cmd = "ls "+folder_path
+    process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+    filenames=output.split()
+    print len(filenames)
+    for x in range(200):
+        print "start vali round "+str(x)
+        vali = open(validation_path+str(x)+".txt", 'w')
+        for y in range(1000):
+            person_num =  random.randint(0,2622-1)
+            person = filenames[person_num][:-4]
+            cmd = "cat "+folder_path+person+".txt"
+            process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+            output, error = process.communicate()
+            entries = output.splitlines()
+            entry_total = len(entries)
+            entry_num =  random.randint(0,entry_total-1)
+            entry = entries[entry_num]
+            cmd = "sed -i "+str(entry_num+1)+"d "+folder_path+person+".txt"
+            process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+            output, error = process.communicate()
+            vali.write(str(person_num)+" "+person+" "+entry+"\n")
+        vali.close()
+    print "finished vali"
+    for x in range(200):
+        print "start test round "+str(x)
+        test = open(test_path+str(x)+".txt", 'w')
+        for y in range(1000):
+            person_num =  random.randint(0,2622-1)
+            person = filenames[person_num][:-4]
+            cmd = "cat "+folder_path+person+".txt"
+            process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+            output, error = process.communicate()
+            entries = output.splitlines()
+            entry_total = len(entries)
+            entry_num =  random.randint(0,entry_total-1)
+            entry = entries[entry_num]
+            cmd = "sed -i "+str(entry_num+1)+"d "+folder_path+person+".txt"
+            process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+            output, error = process.communicate()
+            test.write(str(person_num)+" "+person+" "+entry+"\n")
+        test.close()
+    print "finished test"
+
+def get_mini_batch():
+    batch = list()
+    cmd = "ls "+folder_path
+    process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+    filenames=output.split()
+    for x in range(64):
+        person_num = random.randint(0,2622-1)
+        person = filenames[person_num][:-4]
+        cmd = "cat "+folder_path+person+".txt"
+        process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+        output, error = process.communicate()
+        entries = output.splitlines()
+        entry_total = len(entries)
+        entry_num =  random.randint(0,entry_total-1)
+        entry = entries[entry_num]
+        batch.append(str(person_num)+" "+person+" "+entry)
+    return batch
+
 
 def main():
+    select_validation_test()
+    '''
+    batch=get_mini_batch()
+    for b in batch:
+        print b
+    '''
+    #get_real_avg()
+    '''
     batch=sys.argv[1]
-    files=get_filenames(batch)
-    data=process_files(files,batch)
-    print len(data)
+    total = int(sys.argv[2])
+    error = int(sys.argv[3])
+    avg_img=cv2.imread(avg_path+batch+"_"+str(total)+"_avg.png",cv2.IMREAD_UNCHANGED)
+    print avg_path+batch+"_"+str(total)+"_avg.png"
+    avg_img = avg_img.astype(np.float)
+    avg_img=avg_img*(float(total)/float(total-error))
+    cv2.imwrite(avg_path+batch+"_"+str(total-error)+"_avg.png",avg_img)
+    '''
+    #files=get_filenames(batch)
+    #data=process_files(files,batch)
+    #N,avg_img=calculate_avg(files,batch)
+    #print "got avg!"
+    #cv2.imwrite(avg_path+batch+"_"+str(N)+"_avg.png",avg_img)
+    #cv2.imshow('window',avg_img)
+    #cv2.waitKey(0)
+    #cv2.destroyAllWindows()
 
 main()

@@ -1,0 +1,341 @@
+92
+63818 valid pics
+D.B._Sweeney
+error
+error
+D.B._Woodside
+error
+error
+libpng warning: cHRM: inconsistent chromaticities
+libpng warning: iCCP: known incorrect sRGB profile
+error
+Dean_Cain
+Dean_Geyer
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Dean_Martin
+Debby_Ryan
+libpng warning: iCCP: known incorrect sRGB profile
+Debi_Mazar
+Deborah_Kerr
+error
+error
+Debra_Jo_Rupp
+Debra_Wilson
+libpng warning: iCCP: known incorrect sRGB profile
+Debra_Winger
+error
+error
+DeForest_Kelley
+error
+Deidre_Hall
+error
+error
+error
+error
+error
+error
+error
+error
+error
+error
+Della_Reese
+Demian_Bichir
+error
+error
+error
+error
+error
+Denise_Crosby
+libpng warning: iCCP: known incorrect sRGB profile
+error
+Denise_Richards
+error
+Denis_Leary
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+error
+Dennis_Franz
+error
+error
+error
+Dennis_Haysbert
+libpng warning: iCCP: known incorrect sRGB profile
+error
+error
+Dennis_Weaver
+Derek_Hough
+error
+error
+libpng warning: iCCP: known incorrect sRGB profile
+Derek_Jacobi
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+error
+Derek_Mears
+Derek_Theler
+libpng warning: iCCP: known incorrect sRGB profile
+Dermot_Mulroney
+error
+error
+Desmond_Harrington
+libpng warning: iCCP: known incorrect sRGB profile
+Devon_Aoki
+error
+error
+Devon_Bostick
+Devon_Werkheiser
+Dexter_Fletcher
+libpng warning: iCCP: known incorrect sRGB profile
+Diablo_Cody
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Diana_Rigg
+error
+error
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Diane_Farr
+error
+error
+Diane_Keaton
+error
+error
+Diane_Kruger
+Dianne_Wiest
+error
+error
+error
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: extra compressed data
+Dick_Van_Dyke
+Diedrich_Bader
+Diego_Klattenhoff
+error
+Diego_Luna
+error
+error
+error
+error
+error
+Dina_Manzo
+error
+error
+Dina_Merrill
+error
+Dina_Meyer
+error
+error
+Corrupt JPEG data: premature end of data segment
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Diogo_Morgado
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Diora_Baird
+error
+libpng warning: iCCP: known incorrect sRGB profile
+error
+error
+libpng warning: iCCP: profile 'Photoshop ICC profile': 'desc': ICC profile tag start not a multiple of 4
+libpng warning: iCCP: profile 'Photoshop ICC profile': 'wtpt': ICC profile tag start not a multiple of 4
+libpng warning: iCCP: profile 'Photoshop ICC profile': 'bkpt': ICC profile tag start not a multiple of 4
+libpng warning: iCCP: profile 'Photoshop ICC profile': 'rXYZ': ICC profile tag start not a multiple of 4
+libpng warning: iCCP: profile 'Photoshop ICC profile': 'gXYZ': ICC profile tag start not a multiple of 4
+libpng warning: iCCP: profile 'Photoshop ICC profile': 'bXYZ': ICC profile tag start not a multiple of 4
+libpng warning: iCCP: profile 'Photoshop ICC profile': 'dmnd': ICC profile tag start not a multiple of 4
+libpng warning: iCCP: profile 'Photoshop ICC profile': 'dmdd': ICC profile tag start not a multiple of 4
+libpng warning: iCCP: profile 'Photoshop ICC profile': 'vued': ICC profile tag start not a multiple of 4
+libpng warning: iCCP: profile 'Photoshop ICC profile': 'view': ICC profile tag start not a multiple of 4
+libpng warning: iCCP: profile 'Photoshop ICC profile': 'lumi': ICC profile tag start not a multiple of 4
+libpng warning: iCCP: profile 'Photoshop ICC profile': 'meas': ICC profile tag start not a multiple of 4
+libpng warning: iCCP: profile 'Photoshop ICC profile': 'tech': ICC profile tag start not a multiple of 4
+libpng warning: iCCP: profile 'Photoshop ICC profile': 'rTRC': ICC profile tag start not a multiple of 4
+libpng warning: iCCP: profile 'Photoshop ICC profile': 'gTRC': ICC profile tag start not a multiple of 4
+libpng warning: iCCP: profile 'Photoshop ICC profile': 'bTRC': ICC profile tag start not a multiple of 4
+error
+Dirk_Benedict
+error
+Dirk_Bogarde
+error
+Domhnall_Gleeson
+error
+Dominic_Cooper
+libpng warning: iCCP: known incorrect sRGB profile
+error
+error
+error
+Dominic_Keating
+Dominique_Swain
+error
+error
+error
+error
+error
+error
+error
+error
+error
+error
+error
+error
+error
+error
+Donald_Glover
+error
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+error
+Donald_Pleasence
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Donald_Sutherland
+error
+error
+Donal_Logue
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Donna_Dixon
+error
+error
+Donna_Douglas
+error
+Donna_Mills
+error
+error
+error
+error
+error
+error
+error
+error
+error
+error
+Donna_Murphy
+libpng warning: iCCP: known incorrect sRGB profile
+Donna_Reed
+error
+error
+Donnie_Yen
+error
+error
+error
+Don_Rickles
+error
+error
+error
+Doona_Bae
+error
+error
+error
+Dorothy_Dandridge
+libpng warning: iCCP: profile 'icc': 'RGB ': RGB color space not permitted on grayscale PNG
+error
+Dorothy_Malone
+Dot-Marie_Jones
+libpng warning: iCCP: profile 'ICC Profile': 1000000h: invalid rendering intent
+libpng warning: iCCP: profile 'ICC Profile': 1000000h: invalid rendering intent
+Douglas_Booth
+Douglas_Smith
+error
+Dougray_Scott
+Doutzen_Kroes
+error
+Dove_Cameron
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+error
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+error
+Drake_Bell
+error
+libpng warning: iCCP: extra compressed data
+libpng warning: iCCP: extra compressed data
+Dr._Dre
+error
+error
+error
+error
+error
+error
+Drea_de_Matteo
+Dreama_Walker
+Drew_Carey
+libpng warning: iCCP: cHRM chunk does not match sRGB
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Drew_Fuller
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+error
+Drew_Roy
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+error
+libpng warning: iCCP: known incorrect sRGB profile
+Drew_Seeley
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: cHRM chunk does not match sRGB
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Dustin_Milligan
+libpng warning: iCCP: known incorrect sRGB profile
+Dwight_Schultz
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: cHRM chunk does not match sRGB
+libpng warning: iCCP: known incorrect sRGB profile
+Dwight_Yoakam
+Dyan_Cannon
+error
+libpng warning: iCCP: known incorrect sRGB profile
+error
+error
+Dylan_Baker
+error
+error
+Dylan_Bruce
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Dylan_Everett
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Dylan_McDermott
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Dylan_Minnette
+error
+error
+Dylan_Moran
+libpng warning: iCCP: known incorrect sRGB profile
+Dylan_Neal
+Dylan_Sprayberry
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+got avg!
+

@@ -1,0 +1,524 @@
+0
+chenziwe@hollerith:ZFaceNet$ python pre.py batch9
+139
+96990 valid pics
+Jean_Arthur
+libpng warning: iCCP: known incorrect sRGB profile
+error
+Jean_Harlow
+error
+libpng warning: iCCP: known incorrect sRGB profile
+error
+error
+Jeanine_Mason
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Jean_Louisa_Kelly
+error
+error
+error
+error
+Jean-Marc_Barr
+Jeanne_Crain
+error
+error
+error
+error
+error
+error
+Jeanne_Tripplehorn
+error
+error
+error
+error
+error
+error
+error
+error
+error
+Jeannie_Mai
+error
+Jean-Paul_Belmondo
+error
+Jean_Reno
+error
+Jean_Seberg
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: extra compressed data
+Jean_Simmons
+error
+error
+error
+error
+error
+Jean_Smart
+error
+error
+Jeff_Bezos
+libpng warning: iCCP: known incorrect sRGB profile
+Jeff_Chandler
+libpng warning: iCCP: known incorrect sRGB profile
+Jeff_Conaway
+error
+error
+error
+Jeff_Daniels
+error
+Jeff_Fahey
+Jeff_Garlin
+libpng warning: iCCP: known incorrect sRGB profile
+error
+Jeff_Goldblum
+error
+Jeffrey_Dean_Morgan
+Jeffrey_Donovan
+error
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Jeffrey_Hunter
+error
+Jeffrey_Nordling
+error
+libpng warning: iCCP: known incorrect sRGB profile
+Jeffrey_Tambor
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Jeffrey_Wright
+Jemaine_Clement
+error
+error
+Jemima_Rooper
+error
+Jena_Malone
+libpng warning: iCCP: known incorrect sRGB profile
+Jena_Sims
+libpng warning: iCCP: known incorrect sRGB profile
+Jenifer_Lewis
+Jenilee_Harrison
+error
+error
+Jen_Lilley
+error
+error
+error
+error
+error
+error
+error
+error
+error
+error
+error
+error
+error
+error
+error
+error
+error
+Jenna_Boyd
+error
+error
+Jenna_Coleman
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Jenna_Fischer
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Jenna_Haze
+error
+error
+error
+error
+error
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+error
+Jenna_Ushkowitz
+error
+error
+Jenn_Brown
+error
+error
+Jennette_McCurdy
+libpng warning: iCCP: known incorrect sRGB profile
+Jennifer_Beals
+libpng warning: iCCP: known incorrect sRGB profile
+Jennifer_Carpenter
+error
+Jennifer_Coolidge
+error
+error
+error
+error
+error
+error
+error
+error
+error
+error
+error
+error
+Jennifer_Ehle
+error
+error
+Jennifer_Elise_Cox
+error
+error
+error
+error
+error
+Jennifer_Esposito
+error
+Jennifer_Ferrin
+error
+error
+error
+error
+error
+error
+error
+error
+error
+error
+Jennifer_Finnigan
+error
+error
+error
+error
+error
+error
+Jennifer_Freeman
+error
+error
+error
+error
+Jennifer_Jason_Leigh
+error
+Jennifer_Morrison
+error
+error
+Jennifer_Saunders
+error
+Jennifer_Stone
+error
+error
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Jenny_Slate
+libpng warning: iCCP: known incorrect sRGB profile
+Jenny_Wade
+error
+error
+error
+error
+error
+error
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Jensen_Ackles
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: profile 'icc': 'RGB ': RGB color space not permitted on grayscale PNG
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Jeremy_Brett
+libpng warning: iCCP: known incorrect sRGB profile
+error
+Jeremy_Clarkson
+libpng warning: iCCP: known incorrect sRGB profile
+Jeremy_Davies
+Jeremy_Irons
+libpng warning: iCCP: known incorrect sRGB profile
+error
+error
+libpng warning: iCCP: known incorrect sRGB profile
+Jeremy_Irvine
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Jeremy_Northam
+error
+error
+Jeremy_Piven
+error
+error
+Jeremy_Renner
+Jeremy_Shada
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Jeremy_Sisto
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+error
+Jeremy_Sumpter
+error
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+error
+error
+libpng warning: iCCP: known incorrect sRGB profile
+error
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Jerome_Flynn
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Jerry_Ferrara
+error
+error
+libpng warning: iCCP: known incorrect sRGB profile
+error
+Jerry_Orbach
+error
+error
+libpng warning: iCCP: known incorrect sRGB profile
+Jerry_Trainor
+error
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Jes_Macallan
+error
+libpng warning: iCCP: known incorrect sRGB profile
+error
+error
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Jesse_Bradford
+error
+Jesse_Eisenberg
+error
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Jesse_L._Martin
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Jesse_McCartney
+error
+error
+Jesse_Metcalfe
+error
+error
+Jesse_Plemons
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+error
+libpng warning: iCCP: known incorrect sRGB profile
+Jesse_Spencer
+error
+error
+Jesse_Williams
+error
+libpng warning: iCCP: known incorrect sRGB profile
+Jessica_Boehrs
+error
+Jessica_De_Gouw
+libpng error: PNG input buffer is incomplete
+error
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: cHRM chunk does not match sRGB
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+error
+Jessica_Gomes
+error
+Jessica_Hecht
+Jessica_Lowndes
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Jessica_Marais
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Jessica_McNamee
+error
+Jessica_Raine
+Corrupt JPEG data: 342 extraneous bytes before marker 0xd9
+Jessica_Steen
+Jessica_Walter
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Jessie_J
+libpng warning: iCCP: extra compressed data
+error
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+error
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Jessie_Pavelka
+libpng warning: iCCP: known incorrect sRGB profile
+error
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Jessy_Schram
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+error
+Jet_Li
+libpng warning: iCCP: known incorrect sRGB profile
+error
+libpng warning: iCCP: known incorrect sRGB profile
+error
+error
+error
+Jillian_Harris
+Jillian_Michaels
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: cHRM chunk does not match sRGB
+error
+Jillian_Murray
+error
+error
+error
+error
+libpng warning: iCCP: known incorrect sRGB profile
+Jillian_Rose_Reed
+error
+libpng warning: iCCP: known incorrect sRGB profile
+error
+Jill_Scott
+Jill_St._John
+error
+Jill_Wagner
+error
+error
+error
+Jim_Beaver
+Jim_Broadbent
+error
+Jim_Caviezel
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Jim_Henson
+error
+libpng warning: iCCP: known incorrect sRGB profile
+error
+Jim_Jefferies
+Jimmy_Bennett
+libpng warning: iCCP: known incorrect sRGB profile
+Jimmy_Fallon
+error
+Jim_Sturgess
+error
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Joan_Allen
+Joan_Blondell
+error
+error
+error
+Joan_Chen
+error
+error
+Joan_Cusack
+error
+error
+Joan_Hickson
+libpng warning: iCCP: profile 'ICC Profile': 0h: PCS illuminant is not D50
+libpng warning: iCCP: profile 'ICC Profile': 0h: PCS illuminant is not D50
+Joanna_Krupa
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: cHRM chunk does not match sRGB
+Joanna_Lumley
+error
+Corrupt JPEG data: premature end of data segment
+error
+Joanne_Froggatt
+libpng warning: iCCP: known incorrect sRGB profile
+error
+error
+Joanne_Kelly
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+error
+libpng warning: iCCP: known incorrect sRGB profile
+error
+libpng warning: iCCP: known incorrect sRGB profile
+Joan_Rivers
+Joan_Van_Ark
+Joaquim_de_Almeida
+Jodi_Benson
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: cHRM chunk does not match sRGB
+libpng warning: iCCP: known incorrect sRGB profile
+Joe_Armstrong
+error
+libpng warning: iCCP: known incorrect sRGB profile
+Joe_Flanigan
+libpng warning: iCCP: known incorrect sRGB profile
+error
+libpng warning: iCCP: known incorrect sRGB profile
+Joe_Jonas
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: cHRM chunk does not match sRGB
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: extra compressed data
+Joe_Lando
+Joel_Courtney
+Joel_Edgerton
+libpng warning: iCCP: known incorrect sRGB profile
+error
+Joel_Gretsch
+libpng warning: iCCP: known incorrect sRGB profile
+error
+error
+Joel_Kinnaman
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+error
+Joelle_Carter
+libpng warning: iCCP: known incorrect sRGB profile
+Joel_McHale
+error
+libpng warning: iCCP: known incorrect sRGB profile
+Joe_Lo_Truglio
+libpng warning: iCCP: known incorrect sRGB profile
+Joe_Manganiello
+Joe_Morton
+libpng warning: iCCP: known incorrect sRGB profile
+Joey_Fatone
+error
+Joey_Heatherton
+error
+error
+error
+error
+error
+error
+error
+error
+Joey_King
+libpng warning: iCCP: extra compressed data
+libpng warning: iCCP: known incorrect sRGB profile
+Joey_McIntyre
+error
+error
+error
+got avg!

@@ -1,0 +1,23 @@
+stochastic gradient descent
+mini-batch size  = 64
+momentum coefficient = 0.9
+
+regularization
+weight decay coefficient = 5e-4
+dropout rate = 0.5 (applied after 2 FC layers)
+
+learning rate initial = 10e-2
+when validation stop increasing, decrease by factor of 10
+
+weights initialization
+gaussian mean = 0
+gaussian std = 10e-2
+
+bias initialization = 0
+
+img_size = 224x224
+
+data augmentation
+flip chance = 0.5
+
+
