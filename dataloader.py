@@ -103,10 +103,8 @@ def random_proc(img):
         return flip_img
     return crop_img
 
-def get_one_sample(filenames):
+def get_one_img_by_name(person):
     while True:
-        person_num = random.randint(0,num_classes-1)
-        person = filenames[person_num][:-4]
         cmd = "cat "+folder_path+person+".txt"
         process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
         output, error = process.communicate()
@@ -131,7 +129,13 @@ def get_one_sample(filenames):
             else:
                 img=random_proc(img)
                 img = img.transpose((2, 0, 1))
-                return img,person_num
+                return img
+
+def get_one_sample(filenames):
+    person_num = random.randint(0,num_classes-1)
+    person = filenames[person_num][:-4]
+    img = get_one_img_by_name(person)
+    return img,person_num
 
 def get_mini_batch():
     start=time.time()
@@ -215,3 +219,30 @@ def num_to_name(num):
     output, error = process.communicate()
     filenames=output.split()
     return filenames[num][:-4]
+
+######################Triplet loss
+def get_one_triplet(filenames):
+    person_num_p = random.randint(0,num_classes-1)
+    person_num_n = random.randint(0,num_classes-1)
+    person_p = filenames[person_num_p][:-4]
+    person_n = filenames[person_num_n][:-4]
+    img1 = get_one_img_by_name(person_p)
+    img2 = get_one_img_by_name(person_p)
+    img3 = get_one_img_by_name(person_n)
+    return [img1,img2,img3]
+
+def get_triplet_batch():
+    start=time.time()
+    triplets = list()
+    cmd = "ls "+folder_path
+    process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+    filenames=output.split()
+    pool = Pool(processes=5)
+    results = pool.map(get_one_triplet, [filenames]*mini_batch_size)
+    for result in results:
+        triplets.append(result)
+    end=time.time()
+    #print 'got batch time: '+str(end-start)
+    #print imgs[0]
+    return triplets 

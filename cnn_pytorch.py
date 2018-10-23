@@ -24,6 +24,7 @@ folder_path="vgg_face_dataset/files_10/"
 validation_path="vgg_face_dataset/validation_10/"
 test_path="vgg_face_dataset/test_10/"
 model_path="models/model_11.ckpt"
+triplet_model_path="models/triplet_model_11.ckpt"
 
 #####################################CNN structure
 
@@ -88,8 +89,10 @@ num_filters14 = 1024
 # Fully-connected layer.
 fc_size = 512
 
+triplet_size = 10
+
 ##################################Other params
-num_epochs=10
+num_epochs=100
 vali_epoch_num= 5
 test_epoch_num = 10
 
@@ -104,8 +107,10 @@ momentum_coeff = 0.9
 weight_decay_coeff = 5e-4
 dropout_rate = 0.5     #applied after 2 FC layers
 
-learning_rate_init = 10e-2
+learning_rate = 10e-2
 decrease_factor = 10.0    #when validation accuracy stop increasing
+
+triplet_learning_rate = 0.25
 
 #weights initialization
 weights_init_mean= 0.0
@@ -124,7 +129,7 @@ def init_weights(m):
         m.bias.data.fill_(bias_init)
 
 class ConvNet(nn.Module):
-    def __init__(self, num_classes=num_classes):
+    def __init__(self):
         super(ConvNet, self).__init__()
         self.layer1 = nn.Sequential(
             nn.Conv2d(num_channels, num_filters1, kernel_size=filter_size1, padding=1),
@@ -180,6 +185,10 @@ class ConvNet(nn.Module):
         self.fc1.apply(init_weights)
         self.fc2 = nn.Linear(fc_size, num_classes)
         self.fc2.apply(init_weights)
+        # Load checkpoint
+        if os.path.isfile(model_path):
+            self.load_state_dict(torch.load(model_path))
+            print "loaded checkpoint!"
     
     def forward(self, x): 
         out = self.layer1(x)
@@ -195,73 +204,162 @@ class ConvNet(nn.Module):
         out = self.fc2(out)
         return out 
 
-model = ConvNet(num_classes).to(device)
+class ConvNet2(ConvNet):
+    def __init__(self):
+        super(ConvNet2, self).__init__()
+        self.fc3 = nn.Sequential(
+                nn.BatchNorm1d(num_classes),
+                nn.Linear(num_classes, triplet_size))
+        self.fc3.apply(init_weights)
+        # Load checkpoint
+        if os.path.isfile(triplet_model_path):
+            self.load_state_dict(torch.load(triplet_model_path))
+            print "loaded triplet checkpoint!"
 
-# Load checkpoint
-if os.path.isfile(model_path):
-    model.load_state_dict(torch.load(model_path))
-    print "loaded checkpoint!"
+    def forward(self, ts): 
+        outs = list()
+        for t in ts:
+            out = super(ConvNet2,self).forward(t)
+            out = nn.functional.normalize(out,p=2)
+            out = self.fc3(out)
+            outs.append(out)
+        outs = torch.stack(outs)
+        return outs
 
-# Freeze the model except last fc layer
-for child in model.children():
-    for param in child.parameters():
-        param.requires_grad = False
-model.fc2.weight.requires_grad = True
-model.fc2.bias.requires_grad = True
+    def predict(self, x):
+        out = super(ConvNet2,self).forward(x)
+        return out
 
-# Loss and optimizer
-criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate_init,momentum=momentum_coeff,weight_decay=weight_decay_coeff)
-#optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate_init)
+
+# Triplet Training
+triplet_margin = 0.5 
+
+def triplet_loss_one(d1,d2,d3):
+    #d1 d2 d3 are l2-normalized affine-transformed outputs
+    sm = nn.Softmax(dim=0)
+    d1=sm(d1)
+    d2=sm(d2)
+    d3=sm(d3)
+    dis_p=(d1-d2).pow(2).sum()
+    dis_n=(d1-d3).pow(2).sum()
+    loss = triplet_margin - dis_n + dis_p
+    loss = torch.max(torch.cuda.FloatTensor((0,)),loss)
+    return loss
+
+def triplet_loss(results):
+    loss = torch.cuda.FloatTensor((0,))
+    for result in results:
+        d1 = result[0]
+        d2 = result[1]
+        d3 = result[2]
+        loss += triplet_loss_one(d1,d2,d3)
+    return loss
+
+def triplet_train():
+    model = ConvNet2().to(device)
+    model.train()
+    # Freeze the model except last fc layer
+    for child in model.children():
+        for param in child.parameters():
+            param.requires_grad = False
+    model.fc2.weight.requires_grad = True
+    model.fc2.bias.requires_grad = True
+    model.fc3[1].weight.requires_grad = True
+    model.fc3[1].bias.requires_grad = True
+    # Optimizer
+    triplet_optimizer = torch.optim.SGD(model.parameters(), lr=triplet_learning_rate,momentum=momentum_coeff)
+    for epoch in range(num_epochs):
+        triplets = dl.get_triplet_batch()
+        triplets = map(lambda t:map(torch.FloatTensor,t),triplets)
+        triplets = map(torch.stack,triplets)
+        triplets = torch.stack(triplets)
+        triplets = triplets.to(device)
+        # Forward pass
+        outputs = model(triplets)
+        #print model.fc3[1].weight
+        #print outputs
+        loss = triplet_loss(outputs)
+        # Backward and optimize
+        triplet_optimizer.zero_grad()
+        loss.backward()
+        triplet_optimizer.step()
+        
+        print ('Epoch [{}/{}], Loss: {:.4f}'
+                .format(epoch+1, num_epochs, loss.item()))
+        # Save the model checkpoint
+        torch.save(model.state_dict(), triplet_model_path)
 
 # Train the model
-model.train()
-for epoch in range(num_epochs):
-    imgs, labels = dl.get_mini_batch()
-    imgs = map(torch.FloatTensor,imgs)
-    imgs = torch.stack(imgs)
-    labels = torch.LongTensor(labels)
-    imgs = imgs.to(device)
-    labels = labels.to(device)
-    
-    # Forward pass
-    outputs = model(imgs)
-    loss = criterion(outputs, labels)
-    _, predicted = torch.max(outputs.data, 1)
-    #print model.fc1[0].weight
-    #print model.fc2.weight
-    #print predicted 
-    #print labels 
-    
-    # Backward and optimize
-    optimizer.zero_grad()
-    loss.backward()
-    optimizer.step()
-    
-    print ('Epoch [{}/{}], Loss: {:.4f}'
-            .format(epoch+1, num_epochs, loss.item()))
-    total=labels.size(0)
-    correct=(predicted == labels).sum().item()
-    # Save the model checkpoint
-    torch.save(model.state_dict(), model_path)
-    print('Training Accuracy of the model on the {} training images: {} %'.format(total, 100 * correct / total))
-'''
-# Validate the model
-model.eval()
-with torch.no_grad():
-    correct = 0
-    total = 0
-    for i in range(vali_epoch_num):
-        imgs, labels = dl.get_test_batch(vali=True)
+def train():
+    model = ConvNet().to(device)
+    model.train()
+    criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate,momentum=momentum_coeff,weight_decay=weight_decay_coeff)
+    for epoch in range(num_epochs):
+        imgs, labels = dl.get_mini_batch()
         imgs = map(torch.FloatTensor,imgs)
         imgs = torch.stack(imgs)
         labels = torch.LongTensor(labels)
         imgs = imgs.to(device)
         labels = labels.to(device)
+        
+        # Forward pass
         outputs = model(imgs)
+        loss = criterion(outputs, labels)
         _, predicted = torch.max(outputs.data, 1)
-        total += labels.size(0)
-        correct += (predicted == labels).sum().item()
-    print('Validation Accuracy of the model on the {} validation images: {} %'.format(total, 100 * correct / total))
-'''
+        #print model.fc1[0].weight
+        #print model.fc2.weight
+        #print predicted 
+        #print labels 
+        
+        # Backward and optimize
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        
+        print ('Epoch [{}/{}], Loss: {:.4f}'
+                .format(epoch+1, num_epochs, loss.item()))
+        total=labels.size(0)
+        correct=(predicted == labels).sum().item()
+        # Save the model checkpoint
+        torch.save(model.state_dict(), model_path)
+        print('Training Accuracy of the model on the {} training images: {} %'.format(total, 100 * correct / total))
 
+# Validate the model
+def validate():
+    model = ConvNet().to(device)
+    model.eval()
+    with torch.no_grad():
+        correct = 0
+        total = 0
+        for i in range(vali_epoch_num):
+            imgs, labels = dl.get_test_batch(vali=True)
+            imgs = map(torch.FloatTensor,imgs)
+            imgs = torch.stack(imgs)
+            labels = torch.LongTensor(labels)
+            imgs = imgs.to(device)
+            labels = labels.to(device)
+            outputs = model(imgs)
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+        print('Validation Accuracy of the model on the {} validation images: {} %'.format(total, 100 * correct / total))
+
+def validate_triplet():
+    model = ConvNet2().to(device)
+    model.eval()
+    with torch.no_grad():
+        correct = 0
+        total = 0
+        for i in range(vali_epoch_num):
+            imgs, labels = dl.get_test_batch(vali=True)
+            imgs = map(torch.FloatTensor,imgs)
+            imgs = torch.stack(imgs)
+            labels = torch.LongTensor(labels)
+            imgs = imgs.to(device)
+            labels = labels.to(device)
+            outputs = model.predict(imgs)
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+        print('Validation Accuracy of the model on the {} validation images: {} %'.format(total, 100 * correct / total))
