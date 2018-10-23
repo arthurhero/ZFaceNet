@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt 
 import numpy as np
-from sklearn.metrics import confusion_matrix
 import time
 from datetime import timedelta
 import math
@@ -24,7 +23,7 @@ avg_path="vgg_face_dataset/avg/"
 folder_path="vgg_face_dataset/files_10/"
 validation_path="vgg_face_dataset/validation_10/"
 test_path="vgg_face_dataset/test_10/"
-model_path="models/model_14.ckpt"
+model_path="models/model_11.ckpt"
 
 #####################################CNN structure
 
@@ -84,10 +83,10 @@ num_filters13 = 512
 
 # Convolutional Layer 14.
 filter_size14 = 7
-num_filters14 = 2048
+num_filters14 = 1024
 
 # Fully-connected layer.
-fc_size = 2048
+fc_size = 512
 
 ##################################Other params
 num_epochs=10
@@ -174,7 +173,10 @@ class ConvNet(nn.Module):
             nn.Conv2d(num_filters7, num_filters14, kernel_size=filter_size14, padding=0),
             nn.ReLU())
         self.layer14.apply(init_weights)
-        self.fc1 = nn.Linear(num_filters14, fc_size)
+        self.fc1 = nn.Sequential(
+                nn.Linear(num_filters14, fc_size),
+                nn.BatchNorm1d(fc_size),
+                nn.Dropout(p=dropout_rate))
         self.fc1.apply(init_weights)
         self.fc2 = nn.Linear(fc_size, num_classes)
         self.fc2.apply(init_weights)
@@ -195,13 +197,21 @@ class ConvNet(nn.Module):
 
 model = ConvNet(num_classes).to(device)
 
+# Load checkpoint
 if os.path.isfile(model_path):
     model.load_state_dict(torch.load(model_path))
     print "loaded checkpoint!"
 
+# Freeze the model except last fc layer
+for child in model.children():
+    for param in child.parameters():
+        param.requires_grad = False
+model.fc2.weight.requires_grad = True
+model.fc2.bias.requires_grad = True
+
 # Loss and optimizer
 criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate_init,momentum=momentum_coeff)
+optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate_init,momentum=momentum_coeff,weight_decay=weight_decay_coeff)
 #optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate_init)
 
 # Train the model
@@ -218,11 +228,10 @@ for epoch in range(num_epochs):
     outputs = model(imgs)
     loss = criterion(outputs, labels)
     _, predicted = torch.max(outputs.data, 1)
-    #print model.layer1[0].weight 
-    #print imgs
-    print outputs 
-    print predicted 
-    print labels 
+    #print model.fc1[0].weight
+    #print model.fc2.weight
+    #print predicted 
+    #print labels 
     
     # Backward and optimize
     optimizer.zero_grad()
@@ -233,6 +242,8 @@ for epoch in range(num_epochs):
             .format(epoch+1, num_epochs, loss.item()))
     total=labels.size(0)
     correct=(predicted == labels).sum().item()
+    # Save the model checkpoint
+    torch.save(model.state_dict(), model_path)
     print('Training Accuracy of the model on the {} training images: {} %'.format(total, 100 * correct / total))
 '''
 # Validate the model
@@ -251,9 +262,6 @@ with torch.no_grad():
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
-        print 'correct: ',str(correct)
     print('Validation Accuracy of the model on the {} validation images: {} %'.format(total, 100 * correct / total))
 '''
 
-# Save the model checkpoint
-torch.save(model.state_dict(), model_path)

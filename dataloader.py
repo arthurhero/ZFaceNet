@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.metrics import confusion_matrix
 import time
 from datetime import timedelta
 import math
@@ -11,7 +10,6 @@ import urllib2
 import cv2
 import subprocess
 import random
-import numba
 
 avg_path="vgg_face_dataset/avg/"
 folder_path="vgg_face_dataset/files_10/"
