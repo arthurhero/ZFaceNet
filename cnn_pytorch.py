@@ -14,31 +14,29 @@ import os
 
 import torch 
 import torch.nn as nn
+from torch.autograd import Variable
+import torch.nn.functional as F
 import torchvision
 import torchvision.transforms as transforms
 
 import dataloader as dl
 
-avg_path="vgg_face_dataset/avg/"
-folder_path="vgg_face_dataset/files_10/"
-validation_path="vgg_face_dataset/validation_10/"
-test_path="vgg_face_dataset/test_10/"
-model_path="models/model_11.ckpt"
-triplet_model_path="models/triplet_model_11.ckpt"
+model_path="models/model.ckpt"
+triplet_model_path="models/triplet_model.ckpt"
 
 #####################################CNN structure
 
 # Convolutional Layer 1.
 filter_size1 = 3
-num_filters1 = 16
+num_filters1 = 64
 
 # Convolutional Layer 2.
 filter_size2 = 3
-num_filters2 = 32
+num_filters2 = 64
 
 # Convolutional Layer 3.
 filter_size3 = 3
-num_filters3 = 64
+num_filters3 = 128
 
 # Convolutional Layer 4.
 filter_size4 = 3
@@ -56,7 +54,6 @@ num_filters6 = 256
 filter_size7 = 3
 num_filters7 = 256
 
-'''
 # Convolutional Layer 8.
 filter_size8 = 3
 num_filters8 = 512
@@ -80,19 +77,18 @@ num_filters12 = 512
 # Convolutional Layer 13.
 filter_size13 = 3
 num_filters13 = 512
-'''
 
 # Convolutional Layer 14.
 filter_size14 = 7
-num_filters14 = 1024
+num_filters14 = 4096 
 
 # Fully-connected layer.
-fc_size = 512
+fc_size = 4096
 
-triplet_size = 10
+#triplet_size = 1024
 
 ##################################Other params
-num_epochs=100
+num_epochs=10
 vali_epoch_num= 5
 test_epoch_num = 10
 
@@ -110,7 +106,8 @@ dropout_rate = 0.5     #applied after 2 FC layers
 learning_rate = 10e-2
 decrease_factor = 10.0    #when validation accuracy stop increasing
 
-triplet_learning_rate = 0.25
+#triplet_learning_rate = 0.25
+triplet_learning_rate = 10e-3
 
 #weights initialization
 weights_init_mean= 0.0
@@ -156,16 +153,12 @@ class ConvNet(nn.Module):
         self.layer5 = nn.Sequential(
             nn.Conv2d(num_filters4, num_filters5, kernel_size=filter_size5, padding=1),
             nn.BatchNorm2d(num_filters5),
-            #nn.ReLU())
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2))
+            nn.ReLU())
         self.layer5.apply(init_weights)
         self.layer6 = nn.Sequential(
             nn.Conv2d(num_filters5, num_filters6, kernel_size=filter_size6, padding=1),
             nn.BatchNorm2d(num_filters6),
-            #nn.ReLU())
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2))
+            nn.ReLU())
         self.layer6.apply(init_weights)
         self.layer7 = nn.Sequential(
             nn.Conv2d(num_filters6, num_filters7, kernel_size=filter_size7, padding=1),
@@ -174,8 +167,41 @@ class ConvNet(nn.Module):
             nn.MaxPool2d(kernel_size=2, stride=2))
         self.layer7.apply(init_weights)
         #########################
+        self.layer8 = nn.Sequential(
+            nn.Conv2d(num_filters7, num_filters8, kernel_size=filter_size8, padding=1),
+            nn.BatchNorm2d(num_filters8),
+            nn.ReLU())
+        self.layer8.apply(init_weights)
+        self.layer9 = nn.Sequential(
+            nn.Conv2d(num_filters8, num_filters9, kernel_size=filter_size9, padding=1),
+            nn.BatchNorm2d(num_filters9),
+            nn.ReLU())
+        self.layer9.apply(init_weights)
+        self.layer10 = nn.Sequential(
+            nn.Conv2d(num_filters9, num_filters10, kernel_size=filter_size10, padding=1),
+            nn.BatchNorm2d(num_filters10),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2))
+        self.layer10.apply(init_weights)
+        self.layer11 = nn.Sequential(
+            nn.Conv2d(num_filters10, num_filters8, kernel_size=filter_size11, padding=1),
+            nn.BatchNorm2d(num_filters11),
+            nn.ReLU())
+        self.layer11.apply(init_weights)
+        self.layer12 = nn.Sequential(
+            nn.Conv2d(num_filters11, num_filters12, kernel_size=filter_size12, padding=1),
+            nn.BatchNorm2d(num_filters12),
+            nn.ReLU())
+        self.layer12.apply(init_weights)
+        self.layer13 = nn.Sequential(
+            nn.Conv2d(num_filters12, num_filters13, kernel_size=filter_size13, padding=1),
+            nn.BatchNorm2d(num_filters13),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2))
+        self.layer13.apply(init_weights)
+        #########################
         self.layer14 = nn.Sequential(
-            nn.Conv2d(num_filters7, num_filters14, kernel_size=filter_size14, padding=0),
+            nn.Conv2d(num_filters13, num_filters14, kernel_size=filter_size14, padding=0),
             nn.ReLU())
         self.layer14.apply(init_weights)
         self.fc1 = nn.Sequential(
@@ -198,15 +224,21 @@ class ConvNet(nn.Module):
         out = self.layer5(out)
         out = self.layer6(out)
         out = self.layer7(out)
+        out = self.layer8(out)
+        out = self.layer9(out)
+        out = self.layer10(out)
+        out = self.layer11(out)
+        out = self.layer12(out)
+        out = self.layer13(out)
         out = self.layer14(out)
         out = out.reshape(out.size(0), -1) 
         out = self.fc1(out)
         out = self.fc2(out)
         return out 
 
-class ConvNet2(ConvNet):
+class TripNet(ConvNet):
     def __init__(self):
-        super(ConvNet2, self).__init__()
+        super(TripNet, self).__init__()
         self.fc3 = nn.Sequential(
                 nn.BatchNorm1d(num_classes),
                 nn.Linear(num_classes, triplet_size))
@@ -216,47 +248,35 @@ class ConvNet2(ConvNet):
             self.load_state_dict(torch.load(triplet_model_path))
             print "loaded triplet checkpoint!"
 
-    def forward(self, ts): 
-        outs = list()
-        for t in ts:
-            out = super(ConvNet2,self).forward(t)
-            out = nn.functional.normalize(out,p=2)
-            out = self.fc3(out)
-            outs.append(out)
-        outs = torch.stack(outs)
-        return outs
+    def forward(self,img1s,img2s,img3s): 
+        out1s = super(TripNet,self).forward(img1s)
+        out2s = super(TripNet,self).forward(img2s)
+        out3s = super(TripNet,self).forward(img3s)
+        return out1s,out2s,out3s
 
     def predict(self, x):
-        out = super(ConvNet2,self).forward(x)
+        out = super(TripNet,self).forward(x)
         return out
-
 
 # Triplet Training
 triplet_margin = 0.5 
 
-def triplet_loss_one(d1,d2,d3):
-    #d1 d2 d3 are l2-normalized affine-transformed outputs
-    sm = nn.Softmax(dim=0)
-    d1=sm(d1)
-    d2=sm(d2)
-    d3=sm(d3)
-    dis_p=(d1-d2).pow(2).sum()
-    dis_n=(d1-d3).pow(2).sum()
-    loss = triplet_margin - dis_n + dis_p
-    loss = torch.max(torch.cuda.FloatTensor((0,)),loss)
-    return loss
-
-def triplet_loss(results):
-    loss = torch.cuda.FloatTensor((0,))
-    for result in results:
-        d1 = result[0]
-        d2 = result[1]
-        d3 = result[2]
-        loss += triplet_loss_one(d1,d2,d3)
+def triplet_loss(out1s,out2s,out3s):
+    sm = nn.Softmax(dim=1)
+    anchs=sm(out1s)
+    posis=sm(out2s)
+    negas=sm(out3s)
+    dis_ps=F.pairwise_distance(anchs,posis,2)
+    dis_ns=F.pairwise_distance(anchs,negas,2)
+    #print dis_ps,dis_ns
+    target=torch.FloatTensor(dis_ps.size()).fill_(-1).to(device)
+    target=Variable(target)
+    criterion=torch.nn.MarginRankingLoss(margin=triplet_margin)
+    loss=criterion(dis_ps,dis_ns,target)
     return loss
 
 def triplet_train():
-    model = ConvNet2().to(device)
+    model = TripNet().to(device)
     model.train()
     # Freeze the model except last fc layer
     for child in model.children():
@@ -264,26 +284,19 @@ def triplet_train():
             param.requires_grad = False
     model.fc2.weight.requires_grad = True
     model.fc2.bias.requires_grad = True
-    model.fc3[1].weight.requires_grad = True
-    model.fc3[1].bias.requires_grad = True
-    # Optimizer
-    triplet_optimizer = torch.optim.SGD(model.parameters(), lr=triplet_learning_rate,momentum=momentum_coeff)
+    triplet_optimizer = torch.optim.Adam(model.parameters(), lr=triplet_learning_rate)
     for epoch in range(num_epochs):
-        triplets = dl.get_triplet_batch()
-        triplets = map(lambda t:map(torch.FloatTensor,t),triplets)
-        triplets = map(torch.stack,triplets)
-        triplets = torch.stack(triplets)
-        triplets = triplets.to(device)
+        img1s,img2s,img3s= dl.get_triplet_batch()
+        img1s = torch.stack(map(torch.FloatTensor,img1s)).to(device)
+        img2s = torch.stack(map(torch.FloatTensor,img2s)).to(device)
+        img3s = torch.stack(map(torch.FloatTensor,img3s)).to(device)
         # Forward pass
-        outputs = model(triplets)
-        #print model.fc3[1].weight
-        #print outputs
-        loss = triplet_loss(outputs)
+        out1s,out2s,out3s= model(img1s,img2s,img3s)
+        loss = triplet_loss(out1s,out2s,out3s)
         # Backward and optimize
         triplet_optimizer.zero_grad()
         loss.backward()
         triplet_optimizer.step()
-        
         print ('Epoch [{}/{}], Loss: {:.4f}'
                 .format(epoch+1, num_epochs, loss.item()))
         # Save the model checkpoint
@@ -307,10 +320,6 @@ def train():
         outputs = model(imgs)
         loss = criterion(outputs, labels)
         _, predicted = torch.max(outputs.data, 1)
-        #print model.fc1[0].weight
-        #print model.fc2.weight
-        #print predicted 
-        #print labels 
         
         # Backward and optimize
         optimizer.zero_grad()
@@ -346,7 +355,7 @@ def validate():
         print('Validation Accuracy of the model on the {} validation images: {} %'.format(total, 100 * correct / total))
 
 def validate_triplet():
-    model = ConvNet2().to(device)
+    model = TripNet().to(device)
     model.eval()
     with torch.no_grad():
         correct = 0
@@ -363,3 +372,29 @@ def validate_triplet():
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
         print('Validation Accuracy of the model on the {} validation images: {} %'.format(total, 100 * correct / total))
+
+# Get score distance
+def get_score_distance(p1,p2):
+    model = TripNet().to(device)
+    model.eval()
+    with torch.no_grad():
+        img1,img2 = dl.get_one_pair(p1,p2)
+        img1=torch.FloatTensor(img1)
+        img2=torch.FloatTensor(img2)
+        imgs = torch.stack([img1,img2])
+        imgs = imgs.to(device)
+        outputs = model.predict(imgs)
+        d1=outputs[0]
+        d2=outputs[1]
+        sm = nn.Softmax(dim=0)
+        d1=sm(d1)
+        d2=sm(d2)
+        dis=(d1-d2).pow(2).sum()
+        print ('Distance between {} and {} is {:.2f}'.format(p1,p2,dis))
+
+'''
+get_score_distance('Aamir_Khan','Aamir_Khan')
+get_score_distance('Aamir_Khan','Chris_Hemsworth')
+get_score_distance('Aamir_Khan','Scarlett_Pomers')
+get_score_distance('Aamir_Khan','Helen_McCrory')
+'''

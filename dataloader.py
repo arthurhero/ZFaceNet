@@ -12,18 +12,16 @@ import subprocess
 import random
 
 avg_path="vgg_face_dataset/avg/"
-folder_path="vgg_face_dataset/files_10/"
-validation_path="vgg_face_dataset/validation_10/"
-test_path="vgg_face_dataset/test_10/"
+folder_path="vgg_face_dataset/files/"
+validation_path="vgg_face_dataset/validation/"
+test_path="vgg_face_dataset/test/"
 
-#mini_batch_size  = 64
-mini_batch_size  = 32
+mini_batch_size  = 64
 
 orig_img_size=256
 img_size=224
 num_channels = 3
-#num_classes = 2622
-num_classes = 10
+num_classes = 2622
 
 #data augmentation
 flip_chance = 0.5 
@@ -153,7 +151,6 @@ def get_mini_batch():
         labels.append(label)
     end=time.time()
     #print 'got batch time: '+str(end-start)
-    #print imgs[0]
     return imgs, labels
 
 def get_one_test_sample(filenames,path):
@@ -223,26 +220,62 @@ def num_to_name(num):
 ######################Triplet loss
 def get_one_triplet(filenames):
     person_num_p = random.randint(0,num_classes-1)
-    person_num_n = random.randint(0,num_classes-1)
+    person_num_n = 0
+    while True:
+        person_num_n = random.randint(0,num_classes-1)
+        if person_num_p != person_num_n:
+            break
     person_p = filenames[person_num_p][:-4]
     person_n = filenames[person_num_n][:-4]
     img1 = get_one_img_by_name(person_p)
     img2 = get_one_img_by_name(person_p)
     img3 = get_one_img_by_name(person_n)
-    return [img1,img2,img3]
+    return img1,img2,img3
 
+    '''
 def get_triplet_batch():
     start=time.time()
-    triplets = list()
+    cmd = "ls "+folder_path
+    process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+    filenames=output.split()
+    person_num_p = random.randint(0,num_classes-1)
+    person_num_n = 0
+    while True:
+        person_num_n = random.randint(0,num_classes-1)
+        if person_num_p != person_num_n:
+            break
+    person_p = filenames[person_num_p][:-4]
+    person_n = filenames[person_num_n][:-4]
+    pool = Pool(processes=5)
+    img1s = pool.map(get_one_img_by_name, [person_p]*mini_batch_size)
+    img2s = pool.map(get_one_img_by_name, [person_p]*mini_batch_size)
+    img3s = pool.map(get_one_img_by_name, [person_n]*mini_batch_size)
+    end=time.time()
+    #print 'got batch time: '+str(end-start)
+    return img1s,img2s,img3s 
+
+'''
+def get_triplet_batch():
+    start=time.time()
+    img1s=list()
+    img2s=list()
+    img3s=list()
     cmd = "ls "+folder_path
     process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
     output, error = process.communicate()
     filenames=output.split()
     pool = Pool(processes=5)
     results = pool.map(get_one_triplet, [filenames]*mini_batch_size)
-    for result in results:
-        triplets.append(result)
+    for img1,img2,img3 in results:
+        img1s.append(img1)
+        img2s.append(img2)
+        img3s.append(img3)
     end=time.time()
     #print 'got batch time: '+str(end-start)
-    #print imgs[0]
-    return triplets 
+    return img1s,img2s,img3s 
+
+def get_one_pair(p1,p2):
+    img1 = get_one_img_by_name(p1)
+    img2 = get_one_img_by_name(p2)
+    return img1,img2
