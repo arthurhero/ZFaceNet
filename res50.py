@@ -22,7 +22,6 @@ import torchvision.transforms as transforms
 import dataloader as dl
 
 model_path="models/model.ckpt"
-triplet_model_path="models/triplet_model.ckpt"
 
 #################################resnet structure
 
