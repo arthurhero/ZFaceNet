@@ -21,8 +21,8 @@ import torchvision.transforms as transforms
 
 import dataloader as dl
 
-model_path="models/model.ckpt"
-triplet_model_path="models/triplet_model.ckpt"
+model_path="models/model5.ckpt"
+triplet_model_path="models/triplet_model5.ckpt"
 
 #####################################CNN structure
 
@@ -88,22 +88,27 @@ fc_size = 4096
 #triplet_size = 1024
 
 ##################################Other params
-num_epochs=10
+num_epochs=80
 vali_epoch_num= 5
 test_epoch_num = 10
 
 num_channels = dl.num_channels 
 num_classes = dl.num_classes
 
+img_size = dl.img_size
+
 #stochastic gradient descent
 mini_batch_size  = dl.mini_batch_size
-momentum_coeff = 0.9
+momentum_coeff = 0.2
+#momentum_coeff = 0.9
 
 #regularization
 weight_decay_coeff = 5e-4
-dropout_rate = 0.5     #applied after 2 FC layers
+#dropout_rate = 0.5     #applied after 2 FC layers
+dropout_rate = 0     #applied after 2 FC layers
 
-learning_rate = 10e-2
+#learning_rate = 10e-3
+learning_rate = 10e-4
 decrease_factor = 10.0    #when validation accuracy stop increasing
 
 #triplet_learning_rate = 0.25
@@ -128,6 +133,7 @@ def init_weights(m):
 class ConvNet(nn.Module):
     def __init__(self):
         super(ConvNet, self).__init__()
+        self.relupool=nn.Sequential(nn.ReLU(),nn.MaxPool2d(kernel_size=2,stride=2))
         self.layer1 = nn.Sequential(
             nn.Conv2d(num_channels, num_filters1, kernel_size=filter_size1, padding=1),
             nn.BatchNorm2d(num_filters1),
@@ -135,9 +141,7 @@ class ConvNet(nn.Module):
         self.layer1.apply(init_weights)
         self.layer2 = nn.Sequential(
             nn.Conv2d(num_filters1, num_filters2, kernel_size=filter_size2, padding=1),
-            nn.BatchNorm2d(num_filters2),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2))
+            nn.BatchNorm2d(num_filters2))
         self.layer2.apply(init_weights)
         self.layer3 = nn.Sequential(
             nn.Conv2d(num_filters2, num_filters3, kernel_size=filter_size3, padding=1),
@@ -146,9 +150,7 @@ class ConvNet(nn.Module):
         self.layer3.apply(init_weights)
         self.layer4 = nn.Sequential(
             nn.Conv2d(num_filters3, num_filters4, kernel_size=filter_size4, padding=1),
-            nn.BatchNorm2d(num_filters4),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2))
+            nn.BatchNorm2d(num_filters4))
         self.layer4.apply(init_weights)
         self.layer5 = nn.Sequential(
             nn.Conv2d(num_filters4, num_filters5, kernel_size=filter_size5, padding=1),
@@ -162,9 +164,7 @@ class ConvNet(nn.Module):
         self.layer6.apply(init_weights)
         self.layer7 = nn.Sequential(
             nn.Conv2d(num_filters6, num_filters7, kernel_size=filter_size7, padding=1),
-            nn.BatchNorm2d(num_filters7),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2))
+            nn.BatchNorm2d(num_filters7))
         self.layer7.apply(init_weights)
         #########################
         self.layer8 = nn.Sequential(
@@ -179,12 +179,10 @@ class ConvNet(nn.Module):
         self.layer9.apply(init_weights)
         self.layer10 = nn.Sequential(
             nn.Conv2d(num_filters9, num_filters10, kernel_size=filter_size10, padding=1),
-            nn.BatchNorm2d(num_filters10),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2))
+            nn.BatchNorm2d(num_filters10))
         self.layer10.apply(init_weights)
         self.layer11 = nn.Sequential(
-            nn.Conv2d(num_filters10, num_filters8, kernel_size=filter_size11, padding=1),
+            nn.Conv2d(num_filters10, num_filters11, kernel_size=filter_size11, padding=1),
             nn.BatchNorm2d(num_filters11),
             nn.ReLU())
         self.layer11.apply(init_weights)
@@ -195,9 +193,7 @@ class ConvNet(nn.Module):
         self.layer12.apply(init_weights)
         self.layer13 = nn.Sequential(
             nn.Conv2d(num_filters12, num_filters13, kernel_size=filter_size13, padding=1),
-            nn.BatchNorm2d(num_filters13),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2))
+            nn.BatchNorm2d(num_filters13))
         self.layer13.apply(init_weights)
         #########################
         self.layer14 = nn.Sequential(
@@ -217,19 +213,44 @@ class ConvNet(nn.Module):
             print "loaded checkpoint!"
     
     def forward(self, x): 
+        batch_size=x.size()[0]
+        res1=x
         out = self.layer1(x)
         out = self.layer2(out)
+        pad1 = Variable(torch.zeros(batch_size,num_filters2-num_channels,img_size,img_size).to(device))
+        respad1 = torch.cat((res1,pad1),1)
+        out += respad1
+        out = self.relupool(out)
+        res2 = out
         out = self.layer3(out)
         out = self.layer4(out)
+        pad2 = Variable(torch.zeros(batch_size,num_filters4-num_filters2,img_size/2,img_size/2).to(device))
+        respad2 = torch.cat((res2,pad2),1)
+        out += respad2
+        out = self.relupool(out)
+        res3 = out
         out = self.layer5(out)
         out = self.layer6(out)
         out = self.layer7(out)
+        pad3 = Variable(torch.zeros(batch_size,num_filters7-num_filters4,img_size/4,img_size/4).to(device))
+        respad3 = torch.cat((res3,pad3),1)
+        out += respad3
+        out = self.relupool(out)
+        res4 = out
         out = self.layer8(out)
         out = self.layer9(out)
         out = self.layer10(out)
+        pad4 = Variable(torch.zeros(batch_size,num_filters10-num_filters7,img_size/8,img_size/8).to(device))
+        respad4 = torch.cat((res4,pad4),1)
+        out += respad4
+        out = self.relupool(out)
+        res5 = out
         out = self.layer11(out)
         out = self.layer12(out)
         out = self.layer13(out)
+        # no need for padding here
+        out += res5
+        out = self.relupool(out)
         out = self.layer14(out)
         out = out.reshape(out.size(0), -1) 
         out = self.fc1(out)
@@ -239,10 +260,12 @@ class ConvNet(nn.Module):
 class TripNet(ConvNet):
     def __init__(self):
         super(TripNet, self).__init__()
+        '''
         self.fc3 = nn.Sequential(
                 nn.BatchNorm1d(num_classes),
                 nn.Linear(num_classes, triplet_size))
         self.fc3.apply(init_weights)
+        '''
         # Load checkpoint
         if os.path.isfile(triplet_model_path):
             self.load_state_dict(torch.load(triplet_model_path))
@@ -259,7 +282,7 @@ class TripNet(ConvNet):
         return out
 
 # Triplet Training
-triplet_margin = 0.5 
+triplet_margin = 1 
 
 def triplet_loss(out1s,out2s,out3s):
     sm = nn.Softmax(dim=1)
@@ -269,7 +292,7 @@ def triplet_loss(out1s,out2s,out3s):
     dis_ps=F.pairwise_distance(anchs,posis,2)
     dis_ns=F.pairwise_distance(anchs,negas,2)
     #print dis_ps,dis_ns
-    target=torch.FloatTensor(dis_ps.size()).fill_(-1).to(device)
+    target=torch.FloatTensor(dis_ps.size()).fill_(-1.0).to(device)
     target=Variable(target)
     criterion=torch.nn.MarginRankingLoss(margin=triplet_margin)
     loss=criterion(dis_ps,dis_ns,target)
@@ -307,7 +330,9 @@ def train():
     model = ConvNet().to(device)
     model.train()
     criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate,momentum=momentum_coeff,weight_decay=weight_decay_coeff)
+    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate,momentum=momentum_coeff)
+    #optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate,momentum=momentum_coeff,weight_decay=weight_decay_coeff)
+    #optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate,weight_decay=weight_decay_coeff)
     for epoch in range(num_epochs):
         imgs, labels = dl.get_mini_batch()
         imgs = map(torch.FloatTensor,imgs)
@@ -315,9 +340,11 @@ def train():
         labels = torch.LongTensor(labels)
         imgs = imgs.to(device)
         labels = labels.to(device)
+        #print imgs,labels
         
         # Forward pass
         outputs = model(imgs)
+        #print outputs[0],outputs[1]
         loss = criterion(outputs, labels)
         _, predicted = torch.max(outputs.data, 1)
         
@@ -325,6 +352,8 @@ def train():
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+
+        #print model.fc2.weight
         
         print ('Epoch [{}/{}], Loss: {:.4f}'
                 .format(epoch+1, num_epochs, loss.item()))
@@ -375,7 +404,8 @@ def validate_triplet():
 
 # Get score distance
 def get_score_distance(p1,p2):
-    model = TripNet().to(device)
+    model = ConvNet().to(device)
+    #model = TripNet().to(device)
     model.eval()
     with torch.no_grad():
         img1,img2 = dl.get_one_pair(p1,p2)
@@ -383,18 +413,22 @@ def get_score_distance(p1,p2):
         img2=torch.FloatTensor(img2)
         imgs = torch.stack([img1,img2])
         imgs = imgs.to(device)
-        outputs = model.predict(imgs)
+        outputs = model(imgs)
+        #outputs = model.predict(imgs)
         d1=outputs[0]
         d2=outputs[1]
         sm = nn.Softmax(dim=0)
-        d1=sm(d1)
-        d2=sm(d2)
+        d1=sm(d1)*100
+        d2=sm(d2)*100
         dis=(d1-d2).pow(2).sum()
         print ('Distance between {} and {} is {:.2f}'.format(p1,p2,dis))
 
-'''
 get_score_distance('Aamir_Khan','Aamir_Khan')
 get_score_distance('Aamir_Khan','Chris_Hemsworth')
 get_score_distance('Aamir_Khan','Scarlett_Pomers')
 get_score_distance('Aamir_Khan','Helen_McCrory')
-'''
+
+get_score_distance('Chris_Hemsworth','Aamir_Khan')
+get_score_distance('Chris_Hemsworth','Chris_Hemsworth')
+get_score_distance('Chris_Hemsworth','Scarlett_Pomers')
+get_score_distance('Chris_Hemsworth','Helen_McCrory')

@@ -14,9 +14,9 @@ import random
 avg_path="vgg_face_dataset/avg/"
 folder_path="vgg_face_dataset/files/"
 validation_path="vgg_face_dataset/validation/"
-test_path="vgg_face_dataset/test/"
+rest_path="vgg_face_dataset/test/"
 
-mini_batch_size  = 64
+mini_batch_size  = 40
 
 orig_img_size=256
 img_size=224
