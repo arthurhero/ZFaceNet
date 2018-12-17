@@ -232,6 +232,61 @@ def get_real_avg():
         avg_img+=img*(float(num)/float(total))
     cv2.imwrite(avg_path+"real_avg.png",avg_img)
 
+def calculate_var(batch):
+    files=get_filenames(batch)
+    avg_img=cv2.imread(avg_path+"real_avg.png",cv2.IMREAD_UNCHANGED).astype(np.float)
+    cmd = "tail -n 1 "+invalid_path+batch+".txt"
+    process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+    num_invalid = int(output.split(':')[-1])
+    N = NUM_PER_FILE*len(files)-num_invalid
+    var_img=np.zeros((SIZE,SIZE,3),np.float)
+    print str(N)+" valid pics"
+    for f in files:
+        label = f[:-4]
+        print label
+        cmd = "cat "+folder_path+batch+"/"+f
+        process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+        output, error = process.communicate()
+        entries = output.splitlines()
+        for entry in entries:
+            e=entry.split()
+            idnum=int(e[0])
+            '''
+            if label in invalid_map and idnum in invalid_map[label]:
+                continue
+            '''
+            l=float(e[2])
+            t=float(e[3])
+            r=float(e[4])
+            b=float(e[5])
+            raw_img=url_to_image(e[1])
+            if raw_img.shape==(0,):
+                continue
+            else:
+                img=crop_and_scale(raw_img,l,t,r,b)
+                if img.shape==(0,):
+                    continue
+                float_img=img.astype(np.float)
+                var_img+=(np.square(float_img-avg_img))/N
+    return N,var_img
+
+def get_real_var(batches):
+    total=0
+    var_img=np.zeros((SIZE,SIZE,3),np.float)
+    cmd = "ls "+avg_path
+    process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+    filenames=output.split()
+    for f in filenames:
+        num=int(f.split('_')[1])
+        total+=num
+    print total
+    for b in batches:
+        num,img = calculate_var(files,batch)
+        var_img+=img*(float(num)/float(total))
+    return var_img
+
 def select_validation_test():
     cmd = "ls "+folder_path
     process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
@@ -298,7 +353,7 @@ def get_mini_batch():
 
 
 def main():
-    select_validation_test()
+    #select_validation_test()
     '''
     batch=get_mini_batch()
     for b in batch:
@@ -315,10 +370,10 @@ def main():
     avg_img=avg_img*(float(total)/float(total-error))
     cv2.imwrite(avg_path+batch+"_"+str(total-error)+"_avg.png",avg_img)
     '''
-    #files=get_filenames(batch)
     #data=process_files(files,batch)
-    #N,avg_img=calculate_avg(files,batch)
-    #print "got avg!"
+    #N,var_img=calculate_var(files,batch)
+    var_img=get_real_var()
+    print var_img
     #cv2.imwrite(avg_path+batch+"_"+str(N)+"_avg.png",avg_img)
     #cv2.imshow('window',avg_img)
     #cv2.waitKey(0)
