@@ -33,7 +33,6 @@ num_epochs=10
 vali_epoch_num= 5
 test_epoch_num = 10
 
-img_size = dl.img_size
 num_channels = dl.num_channels 
 num_classes = dl.num_classes
 
@@ -98,7 +97,7 @@ class ResNet(nn.Module):
     def __init__(self,block):
         super(ResNet, self).__init__()
         self.in_channels=64
-        self.conv1=nn.Conv2d(3,self.in_channels,kernel_size=7,stride=2,padding=3)
+        self.conv1=nn.Conv2d(num_channels,self.in_channels,kernel_size=7,stride=2,padding=3)
         self.conv1.apply(init_weights)
         self.bn1=nn.BatchNorm2d(self.in_channels)
         self.pool1=nn.MaxPool2d(kernel_size=3,stride=2,padding=1)
