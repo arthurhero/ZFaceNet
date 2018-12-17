@@ -16,7 +16,7 @@ folder_path="vgg_face_dataset/files/"
 validation_path="vgg_face_dataset/validation/"
 test_path="vgg_face_dataset/test/"
 
-mini_batch_size  = 256
+mini_batch_size  = 128
 
 orig_img_size=256
 img_size=224
