@@ -1,3 +1,3 @@
-import cnn_pytorch as cp
+import res50 as r50
 
-cp.train()
+r50.train()
