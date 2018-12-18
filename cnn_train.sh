@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for value in $(seq 20)
+for value in $(seq 5)
 do
     echo $value
     python train.py

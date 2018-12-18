@@ -9,7 +9,10 @@ import random
  
 invalid_path="vgg_face_dataset/invalid/"
 avg_path="vgg_face_dataset/avg/"
-folder_path="vgg_face_dataset/files/"
+var_path="vgg_face_dataset/var/"
+avg_path2="vgg_face_dataset/avg2/"
+#folder_path="vgg_face_dataset/files/"
+folder_path="/home/chenziwe/face/files_cleaned/"
 validation_path="vgg_face_dataset/validation/"
 test_path="vgg_face_dataset/test/"
 
@@ -232,6 +235,82 @@ def get_real_avg():
         avg_img+=img*(float(num)/float(total))
     cv2.imwrite(avg_path+"real_avg.png",avg_img)
 
+def calculate_var(batch):
+    files=get_filenames(batch)
+    avg_img=cv2.imread(avg_path+"real_avg.png",cv2.IMREAD_UNCHANGED).astype(np.float)
+    cmd = "tail -n 1 "+invalid_path+batch+".txt"
+    process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+    num_invalid = int(output.split(':')[-1])
+    N = NUM_PER_FILE*len(files)-num_invalid
+    var_img=np.zeros((SIZE,SIZE,3),np.float)
+    print str(N)+" valid pics"
+    for f in files:
+        label = f[:-4]
+        print label
+        cmd = "cat "+folder_path+batch+"/"+f
+        process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+        output, error = process.communicate()
+        entries = output.splitlines()
+        for entry in entries:
+            e=entry.split()
+            idnum=int(e[0])
+            '''
+            if label in invalid_map and idnum in invalid_map[label]:
+                continue
+            '''
+            l=float(e[2])
+            t=float(e[3])
+            r=float(e[4])
+            b=float(e[5])
+            raw_img=url_to_image(e[1])
+            if raw_img.shape==(0,):
+                continue
+            else:
+                img=crop_and_scale(raw_img,l,t,r,b)
+                if img.shape==(0,):
+                    continue
+                float_img=img.astype(np.float)
+                var_img+=(np.square(float_img-avg_img))/N
+    return N,var_img
+
+def get_real_var():
+    total=0
+    var_img=np.zeros((SIZE,SIZE,3),np.float)
+    cmd = "ls "+var_path
+    process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+    filenames=output.split()
+    for f in filenames:
+        num=int(f.split('_')[1])
+        total+=num
+    print total
+    for f in filenames:
+        img = np.loadtxt(var_path+f).astype(np.float)
+        img = img.reshape((256,256,3))
+        num=int(f.split('_')[1])
+        var_img+=img*(float(num)/float(total))
+    with file(var_path+"real_var.txt",'w') as outfile:
+        for slice_2d in var_img:
+            np.savetxt(outfile, slice_2d)
+    new_var = np.loadtxt(var_path+"real_var.txt").astype(np.float)
+    new_var = new_var.reshape((256,256,3))
+    assert np.all(new_var == var_img)
+    print "finished assert!"
+
+def get_std():
+    var = np.loadtxt(var_path+"real_var.txt").astype(np.float)
+    var = var.reshape((256,256,3))
+    std=np.sqrt(var)
+    with file(var_path+"real_std.txt",'w') as outfile:
+        for slice_2d in std:
+            np.savetxt(outfile, slice_2d)
+    new_std= np.loadtxt(var_path+"real_std.txt").astype(np.float)
+    new_std = new_std.reshape((256,256,3))
+    assert np.all(new_std == np.sqrt(var))
+    print "finished assert!"
+
+
 def select_validation_test():
     cmd = "ls "+folder_path
     process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
@@ -298,15 +377,16 @@ def get_mini_batch():
 
 
 def main():
-    select_validation_test()
+    #select_validation_test()
     '''
     batch=get_mini_batch()
     for b in batch:
         print b
     '''
     #get_real_avg()
+    get_std()
+    #batch=sys.argv[1]
     '''
-    batch=sys.argv[1]
     total = int(sys.argv[2])
     error = int(sys.argv[3])
     avg_img=cv2.imread(avg_path+batch+"_"+str(total)+"_avg.png",cv2.IMREAD_UNCHANGED)
@@ -315,10 +395,22 @@ def main():
     avg_img=avg_img*(float(total)/float(total-error))
     cv2.imwrite(avg_path+batch+"_"+str(total-error)+"_avg.png",avg_img)
     '''
-    #files=get_filenames(batch)
     #data=process_files(files,batch)
-    #N,avg_img=calculate_avg(files,batch)
-    #print "got avg!"
+    #N,var_img=calculate_var(batch)
+    #batches=["batch11","batch14","batch18","batch21","batch6","batch11-1","batch15","batch19","batch3","batch7","batch1","batch12","batch16","batch2","batch4","batch8","batch10","batch13","batch17","batch20","batch5","batch9"]
+    #var_img=get_real_var(batches)
+    #f = open(var_path+batch+"_"+str(N)+"_var.txt", "w")
+    #print var_img.shape
+    '''
+    with file(var_path+batch+"_"+str(N)+"_var.txt",'w') as outfile:
+        for slice_2d in var_img:
+            np.savetxt(outfile, slice_2d)
+    '''
+    '''load back data
+    new_var = np.loadtxt(var_path+batch+"_"+str(N)+"_var.txt")
+    new_var = new_var.reshape((256,256,3))
+    assert np.all(new_var == var_img)
+    '''
     #cv2.imwrite(avg_path+batch+"_"+str(N)+"_avg.png",avg_img)
     #cv2.imshow('window',avg_img)
     #cv2.waitKey(0)

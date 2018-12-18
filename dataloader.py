@@ -10,9 +10,12 @@ import urllib2
 import cv2
 import subprocess
 import random
+import os
 
 avg_path="vgg_face_dataset/avg/"
+var_path="vgg_face_dataset/var/"
 folder_path="vgg_face_dataset/files/"
+data_path="vgg_face_dataset/data/"
 validation_path="vgg_face_dataset/validation/"
 test_path="vgg_face_dataset/test/"
 
@@ -22,6 +25,8 @@ orig_img_size=256
 img_size=224
 num_channels = 3
 num_classes = 2622
+
+num_img_per=40
 
 #data augmentation
 flip_chance = 0.5 
@@ -85,14 +90,19 @@ def crop_and_scale(img,left,top,right,bottom):
     scale_img=np.int_(scale_img)
     real_avg =np.int_(real_avg)
     result_img = scale_img-real_avg
-    result_img = result_img/255.0 
+    #result_img = result_img/255.0 
     return result_img
 
 def under_prob(prob):
     x=random.randint(0,9999)
     return x<prob*10000
 
+std = np.loadtxt(var_path+"real_std.txt").astype(np.float)
+std = std.reshape((256,256,3))
+
 def random_proc(img):
+    #divide by std
+    img=img/std
     x_start=random.randint(0,orig_img_size-img_size)
     y_start=random.randint(0,orig_img_size-img_size)
     crop_img = img[x_start:x_start+img_size, y_start:y_start+img_size]
@@ -101,52 +111,107 @@ def random_proc(img):
         return flip_img
     return crop_img
 
-def get_one_img_by_name(person):
-    while True:
-        cmd = "cat "+folder_path+person+".txt"
-        process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
-        output, error = process.communicate()
-        entries = output.splitlines()
-        entry_total = len(entries)
-        entry_num =  random.randint(0,entry_total-1)
-        entry = entries[entry_num]
-        e=entry.split()
-        l=float(e[2])
-        t=float(e[3])
-        r=float(e[4])
-        b=float(e[5])
-        if l<=0 or t<=0 or r<=0 or b<=0:
-            continue
-        raw_img=url_to_image(e[1])
-        if raw_img.shape==(0,):
-            continue
-        else:
-            img=crop_and_scale(raw_img,l,t,r,b)
-            if img.shape==(0,):
+def download_imgs_by_name(person):
+    print person
+    es=list()
+    for i in range(0,num_img_per):
+        while True:
+            cmd = "cat "+folder_path+person+".txt"
+            process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+            output, error = process.communicate()
+            entries = output.splitlines()
+            entry_total = len(entries)
+            entry_num =  random.randint(0,entry_total-1)
+            entry = entries[entry_num]
+            e=entry.split()
+            l=float(e[2])
+            t=float(e[3])
+            r=float(e[4])
+            b=float(e[5])
+            if l<=0 or t<=0 or r<=0 or b<=0:
+                continue
+            raw_img=url_to_image(e[1])
+            if raw_img.shape==(0,):
                 continue
             else:
-                img=random_proc(img)
-                img = img.transpose((2, 0, 1))
-                return img
+                img=crop_and_scale(raw_img,l,t,r,b)
+                if img.shape==(0,):
+                    continue
+                else:
+                    #if not os.path.isdir(folder_path+person):
+                    #    os.makedirs(folder_path+person)
+                    es.append(np.int8(img))
+                    break
+    ess = np.asarray(es)
+    with file(data_path+person+".npy",'w') as outfile:
+        np.save(outfile, ess)
+    '''
+    new_data = np.load(folder_path+person+"_data.npy")
+    new_data = new_data.reshape((num_img_per,256,256,3))
+    for i in range(0,len(es)):
+       assert np.all(new_data[i] == es[i])
+    print "assert!"
+    '''
 
-def get_one_sample(filenames):
+def download_data():
+    cmd = "ls "+folder_path
+    process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+    filenames=output.split()
+    start=int(sys.argv[1])
+    end=start+200
+    if end>len(filenames):
+        end = len(filenames)
+    for filename in filenames[start:end]:
+        person = filename[:-4]
+        download_imgs_by_name(person)
+
+#download_data()
+
+faces = list() 
+def read_all_people():
+    start=time.time()
+    cmd = "ls "+folder_path
+    process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+    filenames=output.split()
+    for f in filenames:
+        person = f[:-4]
+        #print person
+        data = np.load(data_path+person+".npy")
+        data = data.reshape((num_img_per,256,256,3))
+        faces.append(data)
+    end=time.time()
+    print "Used "+str(end-start)+" secs to load all people!"
+read_all_people()
+'''
+real_avg=cv2.imread(avg_path+"real_avg.png",cv2.IMREAD_UNCHANGED)
+face1=np.int_(faces[0][0])+real_avg
+cv2.imwrite("face1.png",face1)
+'''
+
+def get_one_img_by_name(person_num):
+    data_num =  random.randint(0,num_img_per-1)
+    img = faces[person_num][data_num]
+    img=random_proc(img)
+    img = img.transpose((2, 0, 1))
+    return img
+
+def get_one_sample():
     person_num = random.randint(0,num_classes-1)
-    person = filenames[person_num][:-4]
-    img = get_one_img_by_name(person)
+    img = get_one_img_by_name(person_num)
     return img,person_num
 
 def get_mini_batch():
     start=time.time()
     imgs = list()
     labels = list()
-    cmd = "ls "+folder_path
-    process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
-    output, error = process.communicate()
-    filenames=output.split()
-    pool = Pool(processes=5)
-    results = pool.map(get_one_sample, [filenames]*mini_batch_size)
-    for pair in results:
-        img, label = pair
+    '''
+    pool = Pool(processes=1)
+    results = pool.map(get_one_sample, [0]*mini_batch_size)
+    '''
+    for i in range(0,mini_batch_size):
+        img, label = get_one_sample()
         imgs.append(img)
         labels.append(label)
     end=time.time()
@@ -200,7 +265,7 @@ def get_test_batch(vali=False):
     process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
     output, error = process.communicate()
     filenames=output.split()
-    pool = Pool(processes=5)
+    pool = Pool(processes=10)
     results = pool.map(get_one_test_sample_wrapper, [(filenames,path)]*mini_batch_size)
     for pair in results:
         img, label = pair
@@ -247,7 +312,7 @@ def get_triplet_batch():
             break
     person_p = filenames[person_num_p][:-4]
     person_n = filenames[person_num_n][:-4]
-    pool = Pool(processes=5)
+    pool = Pool(processes=10)
     img1s = pool.map(get_one_img_by_name, [person_p]*mini_batch_size)
     img2s = pool.map(get_one_img_by_name, [person_p]*mini_batch_size)
     img3s = pool.map(get_one_img_by_name, [person_n]*mini_batch_size)
@@ -265,7 +330,7 @@ def get_triplet_batch():
     process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
     output, error = process.communicate()
     filenames=output.split()
-    pool = Pool(processes=5)
+    pool = Pool(processes=10)
     results = pool.map(get_one_triplet, [filenames]*mini_batch_size)
     for img1,img2,img3 in results:
         img1s.append(img1)

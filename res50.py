@@ -43,7 +43,7 @@ momentum_coeff = 0.9
 #regularization
 weight_decay_coeff = 1e-5
 
-learning_rate = 0.1
+learning_rate = 0.01
 decrease_factor = 10.0    #when validation accuracy stop increasing
 
 bias_init = 0.01
@@ -53,7 +53,7 @@ bias_init = 0.01
 # Device configuration
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
-# Convolutional neural network
+# Initialize parameters
 def init_weights(m):
     if type(m)==nn.Linear or type(m)==nn.Conv2d:
         nn.init.xavier_uniform_(m.weight)
@@ -139,30 +139,38 @@ def train():
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate,momentum=momentum_coeff,weight_decay=weight_decay_coeff)
     for epoch in range(num_epochs):
-        imgs, labels = dl.get_mini_batch()
-        imgs = map(torch.FloatTensor,imgs)
-        imgs = torch.stack(imgs)
-        labels = torch.LongTensor(labels)
-        imgs = imgs.to(device)
-        labels = labels.to(device)
+        for i in range(1,801):
+            #start=time.time()
+            imgs, labels = dl.get_mini_batch()
+            #end=time.time()
+            #print "spent "+str(end-start)+" secs on getting minibatch!"
+            imgs = map(torch.FloatTensor,imgs)
+            imgs = torch.stack(imgs)
+            labels = torch.LongTensor(labels)
+            imgs = imgs.to(device)
+            labels = labels.to(device)
+            
+            # Forward pass
+            outputs = model(imgs)
+            loss = criterion(outputs, labels)
+            _, predicted = torch.max(outputs.data, 1)
+            
+            # Backward and optimize
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            #end2=time.time()
+            #print "spent "+str(end2-end)+" secs on stepping!"
+
+            if i%200==0:
+                # Save the model checkpoint
+                torch.save(model.state_dict(), model_path)
         
-        # Forward pass
-        outputs = model(imgs)
-        loss = criterion(outputs, labels)
-        _, predicted = torch.max(outputs.data, 1)
-        
-        # Backward and optimize
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-        
-        print ('Epoch [{}/{}], Loss: {:.4f}'
-                .format(epoch+1, num_epochs, loss.item()))
-        total=labels.size(0)
-        correct=(predicted == labels).sum().item()
-        # Save the model checkpoint
-        torch.save(model.state_dict(), model_path)
-        print('Training Accuracy of the model on the {} training images: {} %'.format(total, 100 * correct / total))
+                print ('Epoch [{}/{}] Part {}, Loss: {:.4f}'
+                        .format(epoch+1, num_epochs, i/200, loss.item()))
+                total=labels.size(0)
+                correct=(predicted == labels).sum().item()
+                print('Training Accuracy of the model on the {} training images: {} %'.format(total, 100 * correct / total))
 
 # Validate the model
 def validate():
