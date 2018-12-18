@@ -298,6 +298,19 @@ def get_real_var():
     assert np.all(new_var == var_img)
     print "finished assert!"
 
+def get_std():
+    var = np.loadtxt(var_path+"real_var.txt").astype(np.float)
+    var = var.reshape((256,256,3))
+    std=np.sqrt(var)
+    with file(var_path+"real_std.txt",'w') as outfile:
+        for slice_2d in std:
+            np.savetxt(outfile, slice_2d)
+    new_std= np.loadtxt(var_path+"real_std.txt").astype(np.float)
+    new_std = new_std.reshape((256,256,3))
+    assert np.all(new_std == np.sqrt(var))
+    print "finished assert!"
+
+
 def select_validation_test():
     cmd = "ls "+folder_path
     process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
@@ -371,7 +384,7 @@ def main():
         print b
     '''
     #get_real_avg()
-    get_real_var()
+    get_std()
     #batch=sys.argv[1]
     '''
     total = int(sys.argv[2])
