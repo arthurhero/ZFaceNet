@@ -44,17 +44,18 @@ def predict(img):
     filenames=output.split()
     cur_predicts=list()
     scores = np.loadtxt(grinnell_score_file).astype(np.float)
+    scores = scores.reshape((len(filenames),2622))
     for i in range(0,len(filenames)):
         s=scores[i]
         dis=(s-score).pow(2).sum()
         if i<5:
             cur_predicts.append((filenames[i][:-4],dis))
-            cur_predicts=sorted(cur_predicts.items(), key=operator.itemgetter(1))
+            cur_predicts=sorted(cur_predicts,key=operator.itemgetter(1))
         else:
             cur_predicts.append((filenames[i][:-4],dis))
-            cur_predicts=sorted(cur_predicts.items(), key=operator.itemgetter(1))
+            cur_predicts=sorted(cur_predicts,key=operator.itemgetter(1))
             cur_predicts=cur_predicts[0:5]
-    print "first prediction is "+cur_predicts[0][0]+"!!!"
+    #print "first prediction is "+cur_predicts[0][0]+"!!!"
     predicts=list()
     for p in cur_predicts:
         predicts.append(p[0])
@@ -62,3 +63,8 @@ def predict(img):
 
 #process_all()
 #record_all_score()
+
+'''
+p=cv2.imread(grinnell_processed_path+"Jerod_Weinman.jpg",cv2.IMREAD_UNCHANGED)
+predict(p)
+'''

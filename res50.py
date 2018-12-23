@@ -198,10 +198,13 @@ def get_score(img):
     model = ResNet(BottleNeck).to(device)
     model.eval()
     with torch.no_grad():
-        img=torch.FloatTensor(img).to(device)
-        output = model(img)
-        sm = nn.Softmax(dim=0)
-        score=sm(d)
+        imgs=torch.stack([torch.FloatTensor(img)])
+        imgs=imgs.to(device)
+        output = model(imgs)[0]
+        #print output
+        sm = nn.LogSoftmax(dim=0)
+        score=sm(output)
+        #print score 
         return score
 
 # Get score distance
