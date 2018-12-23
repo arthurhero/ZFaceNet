@@ -3,6 +3,7 @@ import numpy as np
 import subprocess
 import os
 import sys
+import operator
 
 import res50 as r50
 
@@ -41,17 +42,23 @@ def predict(img):
     process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
     output, error = process.communicate()
     filenames=output.split()
-    cur_predict=""
-    cur_dis_min=sys.maxint
+    cur_predicts=list()
     scores = np.loadtxt(grinnell_score_file).astype(np.float)
     for i in range(0,len(filenames)):
         s=scores[i]
         dis=(s-score).pow(2).sum()
-        if dis<cur_dis_min:
-            cur_dis_min=dis
-            cur_predict=filenames[i][:-4]
-    print "Prediction is "+cur_predict+"!!!"
-    return cur_predict
+        if i<5:
+            cur_predicts.append((filenames[i][:-4],dis))
+            cur_predicts=sorted(cur_predicts.items(), key=operator.itemgetter(1))
+        else:
+            cur_predicts.append((filenames[i][:-4],dis))
+            cur_predicts=sorted(cur_predicts.items(), key=operator.itemgetter(1))
+            cur_predicts=cur_predicts[0:5]
+    print "first prediction is "+cur_predicts[0][0]+"!!!"
+    predicts=list()
+    for p in cur_predicts:
+        predicts.append(p[0])
+    return predicts
 
 #process_all()
 #record_all_score()
