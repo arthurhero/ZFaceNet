@@ -384,7 +384,16 @@ def main():
         print b
     '''
     #get_real_avg()
-    get_std()
+    #get_std()
+    '''
+    std= np.loadtxt(var_path+"real_std.txt").astype(np.float)
+    std = std.reshape((256,256,3))
+    std=np.uint8(std)
+    cv2.imshow("std",std)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    '''
+
     #batch=sys.argv[1]
     '''
     total = int(sys.argv[2])
