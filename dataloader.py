@@ -19,6 +19,9 @@ data_path="vgg_face_dataset/data/"
 validation_path="vgg_face_dataset/validation/"
 test_path="vgg_face_dataset/test/"
 
+std = np.loadtxt(var_path+"real_std.txt").astype(np.float)
+std = std.reshape((256,256,3))
+
 mini_batch_size  = 128
 
 orig_img_size=256
@@ -90,15 +93,11 @@ def crop_and_scale(img,left,top,right,bottom):
     scale_img=np.int_(scale_img)
     real_avg =np.int_(real_avg)
     result_img = scale_img-real_avg
-    #result_img = result_img/255.0 
     return result_img
 
 def under_prob(prob):
     x=random.randint(0,9999)
     return x<prob*10000
-
-std = np.loadtxt(var_path+"real_std.txt").astype(np.float)
-std = std.reshape((256,256,3))
 
 def random_proc(img):
     #divide by std
@@ -159,7 +158,7 @@ def download_data():
     output, error = process.communicate()
     filenames=output.split()
     start=int(sys.argv[1])
-    end=start+200
+    end=start+400
     if end>len(filenames):
         end = len(filenames)
     for filename in filenames[start:end]:
@@ -167,6 +166,15 @@ def download_data():
         download_imgs_by_name(person)
 
 #download_data()
+
+def download_random_data():
+    cmd = "ls "+folder_path
+    process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+    filenames=output.split()
+    person_num = random.randint(0,num_classes-1)
+    person=filenames[person_num][:-4]
+    download_imgs_by_name(person)
 
 faces = list() 
 def read_all_people():
@@ -183,7 +191,6 @@ def read_all_people():
         faces.append(data)
     end=time.time()
     print "Used "+str(end-start)+" secs to load all people!"
-read_all_people()
 '''
 real_avg=cv2.imread(avg_path+"real_avg.png",cv2.IMREAD_UNCHANGED)
 face1=np.int_(faces[0][0])+real_avg

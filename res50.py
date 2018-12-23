@@ -29,7 +29,7 @@ model_path="models/model.ckpt"
 num_blocks= [3,4,6,3]
 
 ##################################Other params
-num_epochs=10
+num_epochs=5
 vali_epoch_num= 5
 test_epoch_num = 10
 
@@ -134,6 +134,7 @@ class ResNet(nn.Module):
 
 # Train the model
 def train():
+    dl.read_all_people()
     model = ResNet(BottleNeck).to(device)
     model.train()
     criterion = nn.CrossEntropyLoss()
@@ -192,6 +193,17 @@ def validate():
             correct += (predicted == labels).sum().item()
         print('Validation Accuracy of the model on the {} validation images: {} %'.format(total, 100 * correct / total))
 
+# Get score
+def get_score(img):
+    model = ResNet(BottleNeck).to(device)
+    model.eval()
+    with torch.no_grad():
+        img=torch.FloatTensor(img).to(device)
+        output = model(img)
+        sm = nn.Softmax(dim=0)
+        score=sm(d)
+        return score
+
 # Get score distance
 def get_score_distance(p1,p2):
     model = ResNet(BottleNeck).to(device)
@@ -210,10 +222,3 @@ def get_score_distance(p1,p2):
         d2=sm(d2)
         dis=(d1-d2).pow(2).sum()
         print ('Distance between {} and {} is {:.2f}'.format(p1,p2,dis))
-
-'''
-get_score_distance('Aamir_Khan','Aamir_Khan')
-get_score_distance('Aamir_Khan','Chris_Hemsworth')
-get_score_distance('Aamir_Khan','Scarlett_Pomers')
-get_score_distance('Aamir_Khan','Helen_McCrory')
-'''
